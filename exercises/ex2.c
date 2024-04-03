@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 // constants
-#define NUM_ELEMENTS 10000
+#define NUM_ELEMENTS 1000
 #define NUM_THREADS 4
 
 // make a global array of 10000 integers
@@ -12,11 +12,10 @@ int arr[NUM_ELEMENTS] = {0};
 
 // increment each element of the array by 1
 void *increment(void *arg) {
-    // cast the argument to an integer
-    int index = (int)arg;
-    // increment the element at the index
-    arr[index]++;
-    // return NULL
+    (void)arg;
+    for (int i = 0; i < NUM_ELEMENTS; i++) {
+        arr[i]++;
+    }
     return NULL;
 }
 
@@ -28,7 +27,7 @@ int main(void) {
 
     // launch threads
     for (int i = 0; i < NUM_THREADS; i++) {
-        pthread_create(thread + 1, NULL, increment, (void *)i);
+        pthread_create(thread + 1, NULL, increment, NULL);
     }
 
     // join threads
