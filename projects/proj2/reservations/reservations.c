@@ -28,16 +28,17 @@ int reserve_seat(int n)
     // This function should also increment seat_taken_count if the seat
     // wasn't already taken.
     
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&mutex); 
 
-    if (seat_taken[n] == 1) {
-         pthread_mutex_unlock(&mutex);
-        return -1;
+    if (seat_taken[n] == 0) {
+        seat_taken[n] = 1; 
+        seat_taken_count++;
+        pthread_mutex_unlock(&mutex); 
+        return 0; 
+    } else {
+        pthread_mutex_unlock(&mutex); 
+        return -1; 
     }
-    seat_taken[n] = 1;
-    seat_taken_count++;
-    pthread_mutex_unlock(&mutex);
-    return 0;
 
 }
 
@@ -51,16 +52,17 @@ int free_seat(int n)
     // This function should also decrement seat_taken_count if the seat
     // wasn't already free.
 
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&mutex); // Lock the mutex before modifying shared resources
 
-    if (seat_taken[n] == 0) {
-        pthread_mutex_unlock(&mutex);
-        return -1;
+    if (seat_taken[n] == 1) {
+        seat_taken[n] = 0; 
+        seat_taken_count--;
+        pthread_mutex_unlock(&mutex); 
+        return 0; 
+    } else {
+        pthread_mutex_unlock(&mutex); 
+        return -1; 
     }
-    seat_taken[n] = 0;
-    seat_taken_count--;
-    pthread_mutex_unlock(&mutex);
-    return 0;
 
 }
 
