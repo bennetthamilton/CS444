@@ -14,6 +14,7 @@ int seat_count;
 int broker_count;
 int *seat_taken;  // Array of seats
 int transaction_count;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int seat_taken_count = 0;
 
@@ -50,9 +51,13 @@ int free_seat(int n)
 int is_free(int n) {
     // Returns true if the given seat is available.
 
-    // TODO
+    pthread_mutex_lock(&mutex);
 
-    return 0;  // Change as necessary--included so it will build
+    int status = seat_taken[n];     // 0 = free, 1 = taken
+
+    pthread_mutex_unlock(&mutex);
+
+    return status == 0;
 }
 
 int verify_seat_count(void) {
