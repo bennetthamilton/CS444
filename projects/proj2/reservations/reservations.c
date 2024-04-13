@@ -18,6 +18,12 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int seat_taken_count = 0;
 
+int is_free(int n) {
+    // Returns true if the given seat is available.
+
+    return !seat_taken[n];
+}
+
 int reserve_seat(int n)
 {
     // Attempt to reserve seat number n
@@ -30,7 +36,7 @@ int reserve_seat(int n)
     
     pthread_mutex_lock(&mutex); 
 
-    if (seat_taken[n] == 0) {
+    if (is_free(n)) {
         seat_taken[n] = 1; 
         seat_taken_count++;
         pthread_mutex_unlock(&mutex); 
@@ -54,7 +60,7 @@ int free_seat(int n)
 
     pthread_mutex_lock(&mutex); // Lock the mutex before modifying shared resources
 
-    if (seat_taken[n] == 1) {
+    if (!is_free(n)) {
         seat_taken[n] = 0; 
         seat_taken_count--;
         pthread_mutex_unlock(&mutex); 
@@ -64,18 +70,6 @@ int free_seat(int n)
         return -1; 
     }
 
-}
-
-int is_free(int n) {
-    // Returns true if the given seat is available.
-
-    pthread_mutex_lock(&mutex);
-
-    int status = !seat_taken[n];     // if status is 1, the seat is free
-
-    pthread_mutex_unlock(&mutex);
-
-    return status == 1;
 }
 
 int verify_seat_count(void) {
@@ -95,13 +89,15 @@ int verify_seat_count(void) {
 
     // Count all the taken seats
     for (int i = 0; i < seat_count; i++)
-        if (seat_taken[i])
+        if (!is_free(i))
             count++;
+
+    int result = count == seat_taken_count;
 
     pthread_mutex_unlock(&mutex);
 
     // Return true if it's the same as seat_taken_count
-    return count == seat_taken_count;
+    return result;
 }
 
 // ------------------- DO NOT MODIFY PAST THIS LINE -------------------
