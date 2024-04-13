@@ -1,17 +1,14 @@
 # Project 2: Mutexes
 
-_[REMOVE ALL COMMENTS SUCH AS THIS ONE BEFORE CHECKING IN.]_
+A program that allows brokers to reserve (and unreserve) seats at a venue.
 
-_[A good approach to creating the README is to take a stab at it before
-coding, and then fix it up after coding.]_
+The brokers will be simulated and will be reserving and unreserving seats as fast as they can.
 
-_[You may add additional sections to this file if applicable, e.g. `##
-Deploying` or any other information that a user might find
-instructive.]_
+Since the reservation status of all the seats is shared between brokers, we have ample opportunities for race conditions.
+
+You want to write functions to reserve and unreserve seats in such a way that the operations are successful no matter how many brokers are running.
 
 ## Building
-
-_[How to build the program. VS Code part is optional.]_
 
 Command line:
 
@@ -25,12 +22,7 @@ VS Code:
 
 ## Files
 
-_[List files here, even if you only have one. Headers are optional.]_
-
-* `main.c`: The main code to launch the game
-* `life.c`: Code specific to Conway's Life
-* `display.c`: Code to related to display
-* `sysdetect.h`: Some macros for detecting system capabilities
+* `reservations.c`: The main code to launch the program
 
 ## Data
 
@@ -43,35 +35,27 @@ double-buffer during the next generation computation.
 
 If an array element is True, the cell is alive, otherwise it's dead.
 
+There is an array of seats taken. The size is determined by the first argument passed in the command line.
+A '1' represents a taken seat while a '0' represents a free seat.
+
+There is an array of brokers which acts as the threads which run the randomized transactions.
+The second argument in the command line determines the broker count.
+
+There is a number of transactions represented as a integer value, passed as the third argument in the command line.
+
 ## Functions
 
 _[This is a tree of functions and their short descriptions]_
 
-* `main()`
-  * `init()`
-    * `life_init()`: Initializes the cell array to random 
-      * `grid_alloc()`: Allocate space for the cell grid
-      * `randomize()`: Randomize the contents of the cell grid
-    * `display_init()`: Initializes the display
-      * `clear_screen()`
-  * `run()`: Main game running routine
-    * `life_update()`: Update cell data
-      * `update_cell()`: updates a cell based on its neighbors
-        * `get_neighbor_count()`: counts neighbors for a cell
-    * `life_get_cells()`: Get cell status
-    * `display_update()`: Display cells
-      * `home_cursor()`
-    * `delay()`: Delay between frames
-  * `life_shutdown()`: Call before destruction (currently unreachable)
-    * `grid_free()`: Free cell grid memory
+* `main()` : Parses args, init arrays, launches broker threads
+* `seat_broker` : Thread function that buys and sells random seats
+    * `reserve_seat` : Updates seats array, changes 0 to 1
+        * `is_free` : Boolean function that returns true if seat is not taken
+    * `free_seat` : Updates seats array, changes 1 to 0
+        * `is_free` : Boolean function that returns true if seat is not taken
+    * `verify_seat_count` : Verifies 
+        * `is_free` : Boolean function that returns true if seat is not taken
 
 ## Notes
 
-_[Any additional notes, bugs, etc.]_
-
 * `^C` to quit.
-* `life_init()` should allow different kinds of initializations, not
-  just random.
-* UI could be added so the user could draw patterns.
-* Maybe add some preprogrammed patterns, spaceships, etc.
-* Bug: display totally messed up on screens smaller than 80x24
