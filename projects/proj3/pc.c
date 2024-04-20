@@ -41,13 +41,11 @@ void *producer(void *arg)
 
     // Produce events
     for (int i = 0; i < events_to_produce; i++) {
-        // Produce an event
-        int event_num = producer_id * 100 + i;
-
         sem_wait(empty_slots);      // Wait for empty slot
         sem_wait(mutex);            // Lock mutex
 
         // Add event to buffer
+        int event_num = producer_id * 100 + i;
         printf("P%d: adding event %d\n", producer_id, event_num);
         eventbuf_add(eb, event_num);    
 
