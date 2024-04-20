@@ -1,7 +1,5 @@
 # Project 3: Producers and Consumers
 
-_[Title and Description]_
-
 Practice implementing the Producer and Consumer Model using semaphores.
 
 The producers will add "events" to a queue, and the consumers will remove them. (In this case, our "events" are just integers.)
@@ -27,37 +25,45 @@ Command line:
 
 ## Data
 
-_[Description of the main data used in the program. Just list the major
-data structures—not every variable.]_
-
-There is an 80x24 2D array of Booleans that represents the cells, in
-row-major order. Additionally, there's a second parallel array used to
-double-buffer during the next generation computation.
-
-If an array element is True, the cell is alive, otherwise it's dead.
+There are four commandline arguments: `Number of producers`, `Number of consumers`, `How many events each producer will generate`, and `How many outstanding events there can be at a time`
 
 ## Functions
 
-_[This is a tree of functions and their short descriptions]_
-
-* `main()`
-  * `init()`
-    * `life_init()`: Initializes the cell array to random 
-      * `grid_alloc()`: Allocate space for the cell grid
-      * `randomize()`: Randomize the contents of the cell grid
-    * `display_init()`: Initializes the display
-      * `clear_screen()`
-  * `run()`: Main game running routine
-    * `life_update()`: Update cell data
-      * `update_cell()`: updates a cell based on its neighbors
-        * `get_neighbor_count()`: counts neighbors for a cell
-    * `life_get_cells()`: Get cell status
-    * `display_update()`: Display cells
-      * `home_cursor()`
-    * `delay()`: Delay between frames
-  * `life_shutdown()`: Call before destruction (currently unreachable)
-    * `grid_free()`: Free cell grid memory
+* `main()`: Runs the program, initializes threads and semaphores, calls thread functions 
+  * `sem_open_temp`: Creates a semaphore.
+  * `producers`: Produces an event.
+  * `consumers`: Consumes an event.
 
 ## Notes
 
 * `^C` to quit.
+* example output: 
+
+  ./pc 2 4 5 2
+
+  P0: adding event 0
+  P1: adding event 100
+  C0: got event 0
+  P0: adding event 1
+  C0: got event 100
+  C1: got event 1
+  P1: adding event 101
+  P0: adding event 2
+  C2: got event 101
+  C3: got event 2
+  P0: adding event 3
+  P1: adding event 102
+  C0: got event 3
+  C1: got event 102
+  P0: adding event 4
+  P1: adding event 103
+  P0: exiting
+  C2: got event 4
+  C3: got event 103
+  P1: adding event 104
+  P1: exiting
+  C1: got event 104
+  C2: exiting
+  C0: exiting
+  C3: exiting
+  C1: exiting
