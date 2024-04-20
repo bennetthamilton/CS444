@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include "eventbuf.c"
+#include "eventbuf.h"
 
 // Global variables
 struct eventbuf *eb;
@@ -68,20 +68,23 @@ void *consumer(void *arg)
     while (!quitting_time) {
         // Consume events
 
-        sem_wait(empty);    // Wait for an event
+        sem_wait(full);     // Wait for an event
         sem_wait(mutex);    // Lock mutex
 
-        // Exit if no more events or quitting time
-        if (eventbuf_empty(eb) || quitting_time) {   
+        // Exit if buffer is empty
+        if (eventbuf_empty(eb)) {   
             sem_post(mutex);
             break;
+        }
 
-        } else {  // Get event from buffer
-            int event_num = eventbuf_get(eb);
-            printf("C%d: got event %d\n", consumer_id, event_num);
+        int event_num = eventbuf_get(eb);
+        printf("C%d: got event %d\n", consumer_id, event_num);
 
-            sem_post(mutex);    // Unlock mutex
-            sem_post(empty);    // If not done, signal waiting producers
+        sem_post(mutex);    // Unlock mutex
+
+        // If not done, signal waiting producers
+        if (!quitting_time) {
+            sem_post(empty);   
         }
     }
 
@@ -110,7 +113,7 @@ int main(int argc, char *argv[])
     eb = eventbuf_create();
 
     // Initialize semaphores
-    empty = sem_open_temp("/empty", event_count);
+    empty = sem_open_temp("/empty", max_event);
     full = sem_open_temp("/full", 0);
     mutex = sem_open_temp("/mutex", 1);
 

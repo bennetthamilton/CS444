@@ -2,7 +2,7 @@
 
 _[Title and Description]_
 
-Practice implementing the Producer and Consumer Model and semaphores.
+Practice implementing the Producer and Consumer Model using semaphores.
 
 The producers will add "events" to a queue, and the consumers will remove them. (In this case, our "events" are just integers.)
 
