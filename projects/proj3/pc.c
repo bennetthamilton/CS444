@@ -16,6 +16,10 @@
 struct eventbuf *eb;
 sem_t *empty_slots, *filled_slots, *mutex;
 int quitting_time = 0; // Flag to indicate that no more events will be produced
+int producer_count;
+int consumer_count;
+int event_count;
+int max_event;
 
 sem_t *sem_open_temp(const char *name, int value)
 {
@@ -37,10 +41,9 @@ sem_t *sem_open_temp(const char *name, int value)
 void *producer(void *arg)
 {
     int producer_id = *(int *)arg;
-    int events_to_produce = *(int *)(arg + 1);
 
     // Produce events
-    for (int i = 0; i < events_to_produce; i++) {
+    for (int i = 0; i < event_count; i++) {
         sem_wait(empty_slots);      // Wait for empty slot
         sem_wait(mutex);            // Lock mutex
 
@@ -98,10 +101,10 @@ int main(int argc, char *argv[])
     }
 
     // Define arguments
-    int producer_count = atoi(argv[1]);
-    int consumer_count = atoi(argv[2]);
-    int event_count = atoi(argv[3]);
-    int max_event = atoi(argv[4]);
+    producer_count = atoi(argv[1]);
+    consumer_count = atoi(argv[2]);
+    event_count = atoi(argv[3]);
+    max_event = atoi(argv[4]);
 
     // Initialize the buffer
     eb = eventbuf_create();
@@ -113,14 +116,13 @@ int main(int argc, char *argv[])
 
     // Start producer threads
     pthread_t producer_threads[producer_count];
-    int producer_args[producer_count * 2]; // ID and number of events for each producer
+    int producer_ids[producer_count];
 
     for (int i = 0; i < producer_count; i++) {
         // Set arguments
-        producer_args[i * 2] = i; 
-        producer_args[i * 2 + 1] = event_count; 
+        producer_ids[i] = i;
         // Create a new thread
-        pthread_create(&producer_threads[i], NULL, producer, &producer_args[i * 2]);
+        pthread_create(&producer_threads[i], NULL, producer, &producer_ids[i]);
     }
 
     // Start consumer threads
