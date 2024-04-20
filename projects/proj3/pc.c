@@ -14,7 +14,7 @@
 
 // Global variables
 struct eventbuf *eb;
-sem_t *empty, *full, *mutex;
+sem_t *empty_slots, *filled_slots, *mutex;
 int quitting_time = 0; // Flag to indicate that no more events will be produced
 
 sem_t *sem_open_temp(const char *name, int value)
@@ -44,15 +44,15 @@ void *producer(void *arg)
         // Produce an event
         int event_num = producer_id * 100 + i;
 
-        sem_wait(empty);   // Wait for empty slot
-        sem_wait(mutex);   // Lock mutex
+        sem_wait(empty_slots);      // Wait for empty slot
+        sem_wait(mutex);            // Lock mutex
 
         // Add event to buffer
         printf("P%d: adding event %d\n", producer_id, event_num);
         eventbuf_add(eb, event_num);    
 
-        sem_post(mutex);   // Unlock mutex
-        sem_post(full);    // Signal waiting consumers
+        sem_post(mutex);           // Unlock mutex
+        sem_post(filled_slots);    // Signal waiting consumers
     }
 
     // Print that producer is exiting
@@ -68,8 +68,8 @@ void *consumer(void *arg)
     while (!quitting_time) {
         // Consume events
 
-        sem_wait(full);     // Wait for an event
-        sem_wait(mutex);    // Lock mutex
+        sem_wait(filled_slots);     // Wait for an event
+        sem_wait(mutex);            // Lock mutex
 
         // Exit if buffer is empty
         if (eventbuf_empty(eb)) {   
@@ -80,12 +80,8 @@ void *consumer(void *arg)
         int event_num = eventbuf_get(eb);
         printf("C%d: got event %d\n", consumer_id, event_num);
 
-        sem_post(mutex);    // Unlock mutex
-
-        // If not done, signal waiting producers
-        if (!quitting_time) {
-            sem_post(empty);   
-        }
+        sem_post(mutex);         // Unlock mutex
+        sem_post(empty_slots);   // Signal waiting producers
     }
 
     // Print that consumer is exiting
@@ -113,8 +109,8 @@ int main(int argc, char *argv[])
     eb = eventbuf_create();
 
     // Initialize semaphores
-    empty = sem_open_temp("/empty", max_event);
-    full = sem_open_temp("/full", 0);
+    empty_slots = sem_open_temp("/empty", max_event);
+    filled_slots = sem_open_temp("/full", 0);
     mutex = sem_open_temp("/mutex", 1);
 
     // Start producer threads
@@ -149,7 +145,7 @@ int main(int argc, char *argv[])
 
     // Notify all consumer threads that there will be no more events
     for (int i = 0; i < consumer_count; i++) {
-        sem_post(full);
+        sem_post(filled_slots);
     }
 
     // Wait for all consumer threads to finish
@@ -159,8 +155,8 @@ int main(int argc, char *argv[])
 
     // Clean up
     eventbuf_free(eb);
-    sem_close(empty);
-    sem_close(full);
+    sem_close(empty_slots);
+    sem_close(filled_slots);
     sem_close(mutex);
 
     return 0;
