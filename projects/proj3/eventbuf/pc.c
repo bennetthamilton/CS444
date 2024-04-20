@@ -15,6 +15,7 @@
 // Global variables
 struct eventbuf *eb;
 sem_t *empty, *full, *mutex;
+int quitting_time = 0; // Flag to indicate that no more events will be produced
 
 sem_t *sem_open_temp(const char *name, int value)
 {
@@ -43,15 +44,15 @@ void *producer(void *arg)
         // Produce an event
         int event_num = producer_id * 100 + i;
 
-        sem_wait(&empty);   // Wait for empty slot
-        sem_wait(&mutex);   // Lock mutex
+        sem_wait(empty);   // Wait for empty slot
+        sem_wait(mutex);   // Lock mutex
 
         // Add event to buffer
         printf("P%d: adding event %d\n", producer_id, event_num);
         eventbuf_add(eb, event_num);    
 
-        sem_post(&mutex);   // Unlock mutex
-        sem_post(&full);    // Signal waiting consumers
+        sem_post(mutex);   // Unlock mutex
+        sem_post(full);    // Signal waiting consumers
     }
 
     // Print that producer is exiting
@@ -64,18 +65,28 @@ void *consumer(void *arg)
 {
     int consumer_id = *(int *)arg;
 
-    // Consume events
-    while (1) {
-        // Wait for an event
-        // Lock mutex
-        // Check if buffer is empty, if so unlock and exit loop 
-        // Get event from buffer
-        // Print event is being consumed
-        // Unlock mutex
-        // If not done, signal waiting producers
+    while (!quitting_time) {
+        // Consume events
+
+        sem_wait(empty);    // Wait for an event
+        sem_wait(mutex);    // Lock mutex
+
+        // Exit if no more events or quitting time
+        if (eventbuf_empty(eb) || quitting_time) {   
+            sem_post(mutex);
+            break;
+
+        } else {  // Get event from buffer
+            int event_num = eventbuf_get(eb);
+            printf("C%d: got event %d\n", consumer_id, event_num);
+
+            sem_post(mutex);    // Unlock mutex
+            sem_post(empty);    // If not done, signal waiting producers
+        }
     }
 
     // Print that consumer is exiting
+    printf("C%d: exiting\n", consumer_id);
 
     return NULL;
 }
@@ -127,6 +138,9 @@ int main(int argc, char *argv[])
     for (int i = 0; i < producer_count; i++) {
         pthread_join(producer_threads[i], NULL);
     }
+
+    // Set quitting time flag
+    quitting_time = 1;
 
     // Notify all consumer threads that there will be no more events
     for (int i = 0; i < consumer_count; i++) {
