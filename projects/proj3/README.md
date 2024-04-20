@@ -1,36 +1,29 @@
-# Title
+# Project 3: Producers and Consumers
 
 _[Title and Description]_
 
-_[A good approach to creating the README is to take a stab at it before
-coding, and then fix it up after coding.]_
+Practice implementing the Producer and Consumer Model and semaphores.
 
-_[You may add additional sections to this file if applicable, e.g. `##
-Deploying` or any other information that a user might find
-instructive.]_
+The producers will add "events" to a queue, and the consumers will remove them. (In this case, our "events" are just integers.)
+
+When the producers are done, the main thread should signal the consumers to exit.
+
+Each producer is its own thread. Each consumer is its own thread.
+
+All producers will have the same producer run function.
+All consumers will have the same consumer run function.
 
 ## Building
 
-_[How to build the program. VS Code part is optional.]_
-
 Command line:
 
-* `make` to build. An executable called `clife` will be produced.
-* `make clean` to clean up all build products except the executable.
-* `make pristine` to clean up all build products entirely.
-
-VS Code:
-
-* The default build task runs `make`.
+* `make` to build. An executable called `pc` will be produced.
 
 ## Files
 
-_[List files here, even if you only have one. Headers are optional.]_
-
-* `main.c`: The main code to launch the game
-* `life.c`: Code specific to Conway's Life
-* `display.c`: Code to related to display
-* `sysdetect.h`: Some macros for detecting system capabilities
+* `pc.c`: The main code to run the program
+* `eventbuf.c`: Function for event buffer semaphore
+* `eventbuf.h`: Instructions for event buffer functions
 
 ## Data
 
@@ -67,11 +60,4 @@ _[This is a tree of functions and their short descriptions]_
 
 ## Notes
 
-_[Any additional notes, bugs, etc.]_
-
 * `^C` to quit.
-* `life_init()` should allow different kinds of initializations, not
-  just random.
-* UI could be added so the user could draw patterns.
-* Maybe add some preprogrammed patterns, spaceships, etc.
-* Bug: display totally messed up on screens smaller than 80x24
