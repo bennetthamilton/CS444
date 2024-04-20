@@ -44,7 +44,6 @@ void *producer(void *arg)
         int event_num = producer_id * 100 + i;
 
         sem_wait(&empty);   // Wait for empty slot
-    
         sem_wait(&mutex);   // Lock mutex
 
         // Add event to buffer
@@ -52,7 +51,6 @@ void *producer(void *arg)
         eventbuf_add(eb, event_num);    
 
         sem_post(&mutex);   // Unlock mutex
-
         sem_post(&full);    // Signal waiting consumers
     }
 
@@ -64,7 +62,20 @@ void *producer(void *arg)
 
 void *consumer(void *arg)
 {
+    int consumer_id = *(int *)arg;
+
     // Consume events
+    while (1) {
+        // Wait for an event
+        // Lock mutex
+        // Check if buffer is empty, if so unlock and exit loop 
+        // Get event from buffer
+        // Print event is being consumed
+        // Unlock mutex
+        // If not done, signal waiting producers
+    }
+
+    // Print that consumer is exiting
 
     return NULL;
 }
