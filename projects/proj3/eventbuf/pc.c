@@ -35,7 +35,29 @@ sem_t *sem_open_temp(const char *name, int value)
 
 void *producer(void *arg)
 {
+    int producer_id = *(int *)arg;
+    int events_to_produce = *(int *)(arg + 1);
+
     // Produce events
+    for (int i = 0; i < events_to_produce; i++) {
+        // Produce an event
+        int event_num = producer_id * 100 + i;
+
+        sem_wait(&empty);   // Wait for empty slot
+    
+        sem_wait(&mutex);   // Lock mutex
+
+        // Add event to buffer
+        printf("P%d: adding event %d\n", producer_id, event_num);
+        eventbuf_add(eb, event_num);    
+
+        sem_post(&mutex);   // Unlock mutex
+
+        sem_post(&full);    // Signal waiting consumers
+    }
+
+    // Print that producer is exiting
+    printf("P%d: exiting\n", producer_id);
 
     return NULL;
 }
@@ -72,10 +94,14 @@ int main(int argc, char *argv[])
 
     // Start producer threads
     pthread_t producer_threads[producer_count];
+    int producer_args[producer_count * 2]; // ID and number of events for each producer
 
     for (int i = 0; i < producer_count; i++) {
+        // Set arguments
+        producer_args[i * 2] = i; 
+        producer_args[i * 2 + 1] = event_count; 
         // Create a new thread
-        pthread_create(&producer_threads[i], NULL, producer, (void *)&i);
+        pthread_create(&producer_threads[i], NULL, producer, &producer_args[i * 2]);
     }
 
     // Start consumer threads
