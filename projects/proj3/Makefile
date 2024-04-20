@@ -1,6 +1,6 @@
 pc: pc.c
-	gcc -o pc pc.c -lpthread
+	gcc -Wall -Wextra -o pc pc.c eventbuf.c
 
 pc.zip:
 	rm -f $@
-	zip $@ Makefile pc.c
+	zip $@ Makefile pc.c 
