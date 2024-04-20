@@ -1,17 +1,6 @@
-CC=gcc
-CCOPTS=-Wall -Wextra
-LIBS=
+pc: pc.c
+	gcc -o pc pc.c -lpthread
 
-SRCS=$(wildcard *.c)
-TARGETS=$(SRCS:.c=)
-
-.PHONY: all clean
-
-all: $(TARGETS)
-
-clean:
-	rm -f $(TARGETS)
-
-%: %.c
-	$(CC) $(CCOPTS) -o $@ $< $(LIBS)
-    
+pc.zip:
+	rm -f $@
+	zip $@ Makefile pc.c
