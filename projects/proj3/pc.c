@@ -128,10 +128,12 @@ int main(int argc, char *argv[])
 
     // Start consumer threads
     pthread_t consumer_threads[consumer_count];
+    int consumer_ids[consumer_count];
 
     for (int i = 0; i < consumer_count; i++) {
+        consumer_ids[i] = i;
         // Create a new thread
-        pthread_create(&consumer_threads[i], NULL, consumer, (void *)&i);
+        pthread_create(&consumer_threads[i], NULL, consumer, &consumer_ids[i]);
     }
 
     // Wait for all producer threads to finish
