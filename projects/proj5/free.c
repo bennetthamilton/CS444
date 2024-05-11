@@ -7,5 +7,17 @@ void set_free(unsigned char *block, int num, int set) {
 }
 
 int find_free(unsigned char *block) {
-    return 0;
+    
+    for (int byte = 0; byte < 4096; byte++) {
+        int num = block[byte];
+        if (num != 255) {
+            for (int bit = 0; bit < 8; bit++) {
+                if ((num & (1 << bit)) == 0) {
+                    return byte * 8 + bit;
+                }
+            }
+        }
+    }
+    return -1;
 }
+
