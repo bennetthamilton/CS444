@@ -1,5 +1,7 @@
 #include "image.h"
 #include "block.h"
+#include "free.h"
+#include "inode.h"
 #include "testfs.h"
 #include <stdio.h>
 
@@ -7,19 +9,21 @@
 #ifdef CTEST_ENABLE
 
 void test_image_open(){
-    CTEST_ASSERT
+    CTEST_ASSERT(image_open("filesystem.img", 1) != -1, "image_open failed");
 }
 
 void test_image_close(){
-    CTEST_ASSERT
+    CTEST_ASSERT(image_close() != -1, "image_close failed");
 }
 
 void test_block_bread(){
-    CTEST_ASSERT
+    CTEST_ASSERT(bread(0, NULL) != -1, "bread failed");
 }
 
 void test_block_bwrite(){
-    CTEST_ASSERT
+    unsigned char buffer[BLOCK_SIZE];
+    bwrite(0, buffer);
+    CTEST_ASSERT(bwrite_error_flag != -1, "bwrite failed");
 }
 
 int main(){
@@ -49,6 +53,16 @@ int main(){
 
     // Test block bwrite
     bwrite(0, buffer);
+
+    // Test set_free
+    unsigned char block[BLOCK_SIZE];
+    set_free(block, 0, 1);
+
+    // Test find_free
+    find_free(block);
+
+    // Test iaalloc
+    ialloc();
 
     // Print success message
     printf("Testfs is working\n");
