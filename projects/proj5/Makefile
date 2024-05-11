@@ -18,7 +18,13 @@ image.o: image.c image.h
 block.o: block.c block.h
 	$(CC) $(CCOPTS) -c $< -o $@
 
-libvvsfs.a: block.o image.o
+free.0: free.c free.h
+	$(CC) $(CCOPTS) -c $< -o $@
+
+inode.o: inode.c inode.h
+	$(CC) $(CCOPTS) -c $< -o $@
+
+libvvsfs.a: block.o image.o free.o inode.o
 	ar rcs $@ $^
 
 clean:
