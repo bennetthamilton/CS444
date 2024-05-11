@@ -2,6 +2,9 @@
 #include "block.h"
 #include "free.h"
 #include <unistd.h>
+#include <stdio.h>
+
+int bwrite_error_flag = 0;
 
 unsigned char *bread(int block_num, unsigned char *block){
     // Find the block offset using block number and size
