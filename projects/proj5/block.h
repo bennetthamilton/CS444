@@ -5,6 +5,8 @@
 #define INODE_BLOCK 1
 #define FREE_BLOCK 2
 
+int bwrite_error_flag = 0;
+
 unsigned char *bread(int block_num, unsigned char *block);
 void bwrite(int block_num, unsigned char *block);
 int alloc(void);

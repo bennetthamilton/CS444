@@ -23,6 +23,10 @@ void bwrite(int block_num, unsigned char *block){
     // Write the block to the image file
     // ref: https://man7.org/linux/man-pages/man2/write.2.html
     write(image_fd, block, BLOCK_SIZE);
+
+    if (bwrite_error_flag == -1) {
+        perror("bwrite failed");
+    }
 }
 
 int alloc(void){
