@@ -26,6 +26,25 @@ void test_block_bwrite(){
     CTEST_ASSERT(bwrite_error_flag != -1, "bwrite failed");
 }
 
+void test_set_free(){
+    unsigned char block[BLOCK_SIZE];
+    set_free(block, 0, 1);
+    CTEST_ASSERT(block[0] == 1, "set_free failed");
+}
+
+void test_find_free(){
+    unsigned char block[BLOCK_SIZE];
+    CTEST_ASSERT(find_free(block) != -1, "find_free failed");
+}
+
+void test_ialloc(){
+    CTEST_ASSERT(ialloc() != -1, "ialloc failed");
+}
+
+void test_alloc(){
+    CTEST_ASSERT(alloc() != -1, "alloc failed");
+}
+
 int main(){
     CTEST_VERBOSE(1);
     
