@@ -1,17 +1,33 @@
-CC=gcc
+
 CCOPTS=-Wall -Wextra
-LIBS=
+CC=gcc
 
-SRCS=$(wildcard *.c)
-TARGETS=$(SRCS:.c=)
+.PHONY: clean pristine test
 
-.PHONY: all clean
+all: testfs
 
-all: $(TARGETS)
+testfs: testfs.o libvvsfs.a
+	$(CC) $(CCOPTS) $^ -o $@
+
+testfs.o: testfs.c
+	$(CC) $(CCOPTS) -c $< -o $@
+
+image.o: image.c image.h
+	$(CC) $(CCOPTS) -c $< -o $@
+
+block.o: block.c block.h
+	$(CC) $(CCOPTS) -c $< -o $@
+
+libvvsfs.a: block.o image.o
+	ar rcs $@ $^
 
 clean:
-	rm -f $(TARGETS)
+	rm -f *.o 
 
-%: %.c
-	$(CC) $(CCOPTS) -o $@ $< $(LIBS)
-    
+pristine: clean
+	rm -f testfs *.a
+
+test: testfs.c
+	@gcc $(CCOPTS) -DCTEST_ENABLE -o testfs $^
+	@./testfs
+	@rm -f testfs
