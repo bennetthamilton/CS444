@@ -28,10 +28,10 @@ libvvsfs.a: block.o image.o free.o inode.o
 	ar rcs $@ $^
 
 clean:
-	rm -f *.o 
+	rm -f *.o *.img
 
 pristine: clean
-	rm -f testfs *.a
+	rm -f testfs main *.a
 
 test: testfs.c
 	@gcc $(CCOPTS) -DCTEST_ENABLE -o testfs $^
