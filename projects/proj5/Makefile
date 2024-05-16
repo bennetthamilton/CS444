@@ -33,7 +33,7 @@ clean:
 pristine: clean
 	rm -f testfs main *.a
 
-test: testfs.c
+test: testfs.c libvvsfs.a
 	@gcc $(CCOPTS) -DCTEST_ENABLE -o testfs $^
 	@./testfs
 	@rm -f testfs
