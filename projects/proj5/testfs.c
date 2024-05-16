@@ -4,7 +4,7 @@
 #include "inode.h"
 #include "testfs.h"
 #include <stdio.h>
-
+#include <string.h>
 
 #ifdef CTEST_ENABLE
 
@@ -16,14 +16,18 @@ void test_image_close(){
     CTEST_ASSERT(image_close() != -1, "image_close failed");
 }
 
-void test_block_bread(){
-    CTEST_ASSERT(bread(0, NULL) != -1, "bread failed");
-}
+// void test_block_bread(){
+//     CTEST_ASSERT(bread(0, NULL) != -1, "bread failed");
+// }
 
-void test_block_bwrite(){
-    unsigned char buffer[BLOCK_SIZE];
-    bwrite(0, buffer);
-    CTEST_ASSERT(bwrite_error_flag != -1, "bwrite failed");
+void test_block_bwrite_and_read(){
+    unsigned char block[BLOCK_SIZE];
+    unsigned char data[BLOCK_SIZE] = "Hello, World!";
+    
+    bwrite(0, block);
+
+    unsigned char *read_block = bread(0, block);
+    CTEST_ASSERT(memcmp(read_block, data, BLOCK_SIZE), "bwrite and bread failed");
 }
 
 void test_set_free(){
@@ -50,8 +54,12 @@ int main(){
     
     test_image_open();
     test_image_close();
-    test_block_bread();
-    test_block_bwrite();
+    // test_block_bread();
+    test_block_bwrite_and_read();
+    test_set_free();
+    test_find_free();
+    test_ialloc();
+    test_alloc();
 
     CTEST_RESULTS();
     CTEST_EXIT();
