@@ -9,16 +9,12 @@
 #ifdef CTEST_ENABLE
 
 void test_image_open(){
-    CTEST_ASSERT(image_open("filesystem.img", 1) != -1, "image_open failed");
+    CTEST_ASSERT(image_open("filesystem.img", 1) != -1, "checking image open return value");
 }
 
 void test_image_close(){
-    CTEST_ASSERT(image_close() != -1, "image_close failed");
+    CTEST_ASSERT(image_close() != -1, "checking image close return value");
 }
-
-// void test_block_bread(){
-//     CTEST_ASSERT(bread(0, NULL) != -1, "bread failed");
-// }
 
 void test_block_bwrite_and_read(){
     unsigned char block[BLOCK_SIZE];
@@ -27,26 +23,28 @@ void test_block_bwrite_and_read(){
     bwrite(0, block);
 
     unsigned char *read_block = bread(0, block);
-    CTEST_ASSERT(memcmp(read_block, data, BLOCK_SIZE), "bwrite and bread failed");
+    CTEST_ASSERT(memcmp(read_block, data, BLOCK_SIZE), "checking memory block after using bwrite and bread");
 }
 
 void test_set_free(){
     unsigned char block[BLOCK_SIZE];
-    set_free(block, 0, 1);
-    CTEST_ASSERT(block[0] == 1, "set_free failed");
+    int num = 10;
+    int set = 1;
+    set_free(block, num, set);
+    CTEST_ASSERT((block[num / 8] & (1 << (num % 8))) == (set << (num % 8)), "checking set_free block value");
 }
 
 void test_find_free(){
     unsigned char block[BLOCK_SIZE];
-    CTEST_ASSERT(find_free(block) != -1, "find_free failed");
+    CTEST_ASSERT(find_free(block) != -1, "checking find_free return value");
 }
 
 void test_ialloc(){
-    CTEST_ASSERT(ialloc() != -1, "ialloc failed");
+    CTEST_ASSERT(ialloc() != -1, "checking ialloc return value");
 }
 
 void test_alloc(){
-    CTEST_ASSERT(alloc() != -1, "alloc failed");
+    CTEST_ASSERT(alloc() != -1, "checking alloc return value");
 }
 
 int main(){
@@ -54,7 +52,6 @@ int main(){
     
     test_image_open();
     test_image_close();
-    // test_block_bread();
     test_block_bwrite_and_read();
     test_set_free();
     test_find_free();
