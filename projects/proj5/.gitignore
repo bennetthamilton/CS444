@@ -1,4 +1,5 @@
 *.o
 *.a
+*.zip
 main
 filesystem.img
