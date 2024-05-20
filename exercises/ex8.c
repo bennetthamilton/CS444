@@ -31,9 +31,10 @@ void reader_close(struct reader *r)
  */
 unsigned int reader_get_next_u16(struct reader *r)
 {
-    // TODO
-    (void)r;
-    return 999;
+    unsigned int value = read_u16(r->pos);
+    r->pos += 2;    // advance to the next 2-byte value
+
+    return value;
 }
 
 #define TEST_VALUES 5
