@@ -7,7 +7,11 @@
  */
 void loop_path(char *path)
 {
-    // TODO
+    char *token = strtok(path, "/");
+    while (token != NULL) {
+        printf("/%s\n", token);
+        token = strtok(NULL, "/");
+    }
 }
 
 #define TEST_PATH_COUNT 4
